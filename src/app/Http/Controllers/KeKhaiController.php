@@ -11,7 +11,7 @@ class KeKhaiController extends Controller
 {
     public function index()
     {
-        $hosos = HoSo::latest()->paginate(50);
+        $hosos = HoSo::latest()->paginate(500);
         return view("index", compact('hosos'))->with('i', (request()->input('page', 1) - 1) * 50);
     }
 
@@ -28,6 +28,7 @@ class KeKhaiController extends Controller
             'mst' => 'required',
             'ten' => 'required',
             'to' => 'required',
+            'ma_pnn' => 'required',
             'so_gcn' => 'required',
             'ngay_cap' => 'required',
             'tds' => 'required',

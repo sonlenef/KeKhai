@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('mst');
             $table->string('ten');
             $table->string('to');
+            $table->string('ma_pnn');
             $table->string('so_gcn');
             $table->String('ngay_cap');
             $table->string('tds');

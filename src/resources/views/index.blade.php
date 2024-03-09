@@ -6,15 +6,20 @@
         <h2 class="text-center">Danh Sách Tờ Khai</h2>
     </div>
     <div class="col-sm-12 row justify-content-center align-items-center">
-        <div class="col-sm-4 text-center" style="margin-top:10px;margin-bottom: 10px;">
+        <div class="col-sm-3 text-center" style="margin-top:10px;margin-bottom: 10px;">
             <a class="btn btn-primary" href="{{ route('kekhai.create') }}">Thêm tờ khai</a>
         </div>
-        <div class="col-sm-4 text-center"><a class="btn btn-success" href="{{ route('export') }}">Tải xuống</a></div>
+        <div class="col-sm-3 text-center"><a class="btn btn-success" href="{{ route('export') }}">Tải xuống</a></div>
         <!-- Dùng một cột trống để tạo khoảng cách giữa hai nút -->
-        <form class="col-sm-4 text-center" id="resetForm" action="{{ route('reset') }}" method="DELETE">
+        <form class="col-sm-3 text-center" id="resetForm" action="{{ route('reset') }}" method="DELETE">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">Làm mới</button>
+        </form>
+        <form class="col-sm-3 text-center" action="{{ route('upload') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="file" />
+            <button type="submit">Upload</button>
         </form>
     </div>
 </div>

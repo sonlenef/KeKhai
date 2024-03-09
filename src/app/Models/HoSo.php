@@ -12,6 +12,7 @@ class HoSo extends Model
         'mst',
         'ten',
         'to',
+        'ma_pnn',
         'so_gcn',
         'ngay_cap',
         'tds',

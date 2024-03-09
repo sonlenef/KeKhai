@@ -25,7 +25,13 @@
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div class="form-group col-sm-5">
+        <div class="form-group col-sm-3">
+            <label for="ma_pnn">Mã PNN:</label>
+            <input type="text" class="form-control" id="ma_pnn" placeholder="Nhập mã PNN" name="ma_pnn" required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+        <div class="form-group col-sm-2">
             <label for="so_gcn">Số GCN:</label>
             <input type="text" class="form-control" id="so_gcn" placeholder="Nhập số gcn" name="so_gcn" required>
             <div class="valid-feedback">Valid.</div>
