@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('mst');
             $table->string('ten');
             $table->string('to');
+            $table->string('ma_pnn')->nullable();
             $table->string('so_gcn');
             $table->String('ngay_cap');
             $table->string('tds');
@@ -25,7 +26,9 @@ return new class extends Migration {
             $table->string('dia_chi');
             $table->string('han_muc');
             $table->string('vi_tri');
-            $table->string('he_so');
+            $table->string('he_so_22');
+            $table->string('he_so_12');
+            $table->string('he_so_17');
             $table->string('tu_ky');
             $table->string('den_ky');
             $table->string('gia_22');

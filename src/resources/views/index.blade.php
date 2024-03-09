@@ -5,13 +5,23 @@
     <div class="col-lg-12">
         <h2 class="text-center">Danh Sách Tờ Khai</h2>
     </div>
+    <br>
     <div class="col-sm-12 row justify-content-center align-items-center">
-        <div class="col-sm-4 text-center" style="margin-top:10px;margin-bottom: 10px;">
+        <form class="col-sm-12 text-center" action="{{ route('upload') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <a href="{{ asset('example.xlsx') }}" class="btn btn-link" download>Tải file mẫu</a>
+            <input type="file" name="file" />
+            <button class="btn btn-primary" type="submit">Upload</button>
+        </form>
+    </div>
+    <br>
+    <div class="col-sm-12 row justify-content-center align-items-center">
+        <div class="col-sm-3 text-center" style="margin-top:10px;margin-bottom: 10px;">
             <a class="btn btn-primary" href="{{ route('kekhai.create') }}">Thêm tờ khai</a>
         </div>
-        <div class="col-sm-4 text-center"><a class="btn btn-success" href="{{ route('export') }}">Tải xuống</a></div>
+        <div class="col-sm-3 text-center"><a class="btn btn-success" href="{{ route('export') }}">Tải xuống</a></div>
         <!-- Dùng một cột trống để tạo khoảng cách giữa hai nút -->
-        <form class="col-sm-4 text-center" id="resetForm" action="{{ route('reset') }}" method="DELETE">
+        <form class="col-sm-3 text-center" id="resetForm" action="{{ route('reset') }}" method="DELETE">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">Làm mới</button>
@@ -43,7 +53,9 @@
                 <th style="white-space: nowrap;">Địa chỉ thửa đất</th>
                 <th style="white-space: nowrap;">Hạn mức</th>
                 <th style="white-space: nowrap;">Vị trí</th>
-                <th style="white-space: nowrap;">Hệ số</th>
+                <th style="white-space: nowrap;">Hệ số 22-26</th>
+                <th style="white-space: nowrap;">Hệ số 12-16</th>
+                <th style="white-space: nowrap;">Hệ số 17-21</th>
                 <th style="white-space: nowrap;">Từ kỳ</th>
                 <th style="white-space: nowrap;">Đến kỳ</th>
                 <th style="white-space: nowrap;">Giá đất 22-26CN</th>
@@ -53,7 +65,11 @@
             </tr>
         </thead>
         @foreach ($hosos as $hoso)
-        <tr>
+        @php
+        // Lấy năm từ tu_ky để so sánh
+        $year = \Carbon\Carbon::createFromFormat('m/Y', $hoso->tu_ky)->year;
+        @endphp
+        <tr @if($year < 2017 && $hoso->gia_12 == 0) style="background-color: #ffcccc;" @endif>
             <td>{{ ++$i }}</td>
             <td>{{ $hoso->mst }}</td>
             <td style="white-space: nowrap;">{{ $hoso->ten }}</td>
@@ -68,7 +84,9 @@
             <td style="white-space: nowrap;">{{ $hoso->dia_chi }}</td>
             <td>{{ $hoso->han_muc }}</td>
             <td>{{ $hoso->vi_tri }}</td>
-            <td>{{ $hoso->he_so }}</td>
+            <td>{{ $hoso->he_so_22 }}</td>
+            <td>{{ $hoso->he_so_12 }}</td>
+            <td>{{ $hoso->he_so_17 }}</td>
             <td>{{ $hoso->tu_ky }}</td>
             <td>{{ $hoso->den_ky }}</td>
             <td>{{ $hoso->gia_22 }}</td>
@@ -76,7 +94,6 @@
             <td>{{ $hoso->gia_12 }}</td>
             <td style="white-space: nowrap;">
                 <form action="{{ route('kekhai.destroy', $hoso->id) }}" method="POST">
-                    <a class="btn btn-info" href="{{ route('kekhai.show', $hoso->id) }}">Show</a>
                     <a class="btn btn-primary" href="{{ route('kekhai.edit', $hoso->id) }}">Edit</a>
                     @csrf
                     @method('DELETE')

@@ -3,6 +3,9 @@
 @section('content')
 <form id="form-id" action="{{ route('kekhai.store') }}" method="POST" class="needs-validation" novalidate>
     @csrf
+    @if(isset($hoso))
+    <input type="hidden" name="id" value="{{ $hoso->id }}">
+    @endif
     <div class="row">
         <div class="form-group col-sm-5">
             <label for="mst">MST:</label>
@@ -25,7 +28,13 @@
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div class="form-group col-sm-5">
+        <div class="form-group col-sm-3">
+            <label for="ma_pnn">Mã PNN:</label>
+            <input type="text" class="form-control" id="ma_pnn" placeholder="Nhập mã PNN" name="ma_pnn">
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+        <div class="form-group col-sm-2">
             <label for="so_gcn">Số GCN:</label>
             <input type="text" class="form-control" id="so_gcn" placeholder="Nhập số gcn" name="so_gcn" required>
             <div class="valid-feedback">Valid.</div>
@@ -84,31 +93,46 @@
     </div>
 
     <div class="row">
-        <div class="form-group col-sm-2">
+        <div class="form-group col-sm-1">
             <label for="han_muc">Hạn mức:</label>
             <input type="text" class="form-control" id="han_muc" placeholder="Nhập hạn mức" name="han_muc" required>
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div class="form-group col-sm-2">
+        <div class="form-group col-sm-1">
             <label for="vi_tri">Vị trí:</label>
             <input type="text" class="form-control" id="vi_tri" placeholder="Nhập vị trí" name="vi_tri" required>
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
         <div class="form-group col-sm-2">
-            <label for="he_so">Hệ số:</label>
-            <input type="number" class="form-control" id="he_so" placeholder="Nhập hệ số" name="he_so" required>
+            <label for="he_so_22">Hệ số 22-26:</label>
+            <input type="number" class="form-control" id="he_so_22" placeholder="Nhập hệ số 22-26" name="he_so_22"
+                required>
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-2">
+            <label for="he_so_12">Hệ số 12-16:</label>
+            <input type="number" class="form-control" id="he_so_12" placeholder="Nhập hệ số 12-16" name="he_so_12"
+                required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+        <div class="form-group col-sm-2">
+            <label for="he_so_17">Hệ số 17-21:</label>
+            <input type="number" class="form-control" id="he_so_17" placeholder="Nhập hệ số 17-21" name="he_so_17"
+                required>
+            <div class="valid-feedback">Valid.</div>
+            <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+        <div class="form-group col-sm-2">
             <label for="tu_ky">Từ kỳ:</label>
             <input type="text" class="form-control" id="tu_ky" placeholder="Nhập kỳ" name="tu_ky" required>
             <div class="valid-feedback">Valid.</div>
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-2">
             <label for="den_ky">Đến kỳ:</label>
             <input type="text" class="form-control" id="den_ky" placeholder="Nhập kỳ" name="den_ky" value="31/12/2024"
                 required>
@@ -150,6 +174,36 @@
         @endforeach
     </ul>
 </div>
+@endif
+
+@if(isset($hoso))
+<script>
+$(document).ready(function() {
+    // Fill in the form fields with the data from $hoso
+    $("#mst").val('{{ $hoso->mst }}');
+    $("#ten").val('{{ $hoso->ten }}');
+    $("#to").val('{{ $hoso->to }}');
+    $("#ma_pnn").val('{{ $hoso->ma_pnn }}');
+    $("#so_gcn").val('{{ $hoso->so_gcn }}');
+    $("#ngay_cap").val('{{ $hoso->ngay_cap }}');
+    $("#tds").val('{{ $hoso->tds }}');
+    $("#tbd").val('{{ $hoso->tbd }}');
+    $("#dt").val('{{ $hoso->dt }}');
+    $("#duong_pho").val('{{ $hoso->duong_pho }}');
+    $("#doan_duong").val('{{ $hoso->doan_duong }}');
+    $("#dia_chi").val('{{ $hoso->dia_chi }}');
+    $("#han_muc").val('{{ $hoso->han_muc }}');
+    $("#vi_tri").val('{{ $hoso->vi_tri }}');
+    $("#he_so_22").val('{{ $hoso->he_so_22 }}');
+    $("#he_so_12").val('{{ $hoso->he_so_12 }}');
+    $("#he_so_17").val('{{ $hoso->he_so_17 }}');
+    $("#tu_ky").val('{{ $hoso->tu_ky }}');
+    $("#den_ky").val('{{ $hoso->den_ky }}');
+    $("#gia_22").val('{{ $hoso->gia_22 }}');
+    $("#gia_17").val('{{ $hoso->gia_17 }}');
+    $("#gia_12").val('{{ $hoso->gia_12 }}');
+});
+</script>
 @endif
 
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
@@ -304,6 +358,15 @@ $(document).ready(function() {
         typingTimer = setTimeout(function() {
             $('#dia_chi').val('TĐS ' + $('#tds').val() + '-' + $('#tbd').val() + ', ' + $(
                 '#duong_pho').val());
+        }, doneTypingInterval);
+    });
+
+    $('#he_so_22').on('keyup', function() {
+        clearTimeout(typingTimer);
+
+        typingTimer = setTimeout(function() {
+            $('#he_so_12').val(('#he_so_22').val());
+            $('#he_so_17').val(('#he_so_22').val());
         }, doneTypingInterval);
     });
 

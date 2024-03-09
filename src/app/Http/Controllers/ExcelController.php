@@ -5,7 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\HoSo;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date as SharedDate;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use App\Models\GiaDat;
+use App\Models\Doan;
+use App\Models\DuongPho;
+use App\Models\ViTri;
+use Illuminate\Support\Facades\Log;
 
 class ExcelController extends Controller
 {
@@ -72,7 +80,7 @@ class ExcelController extends Controller
             $tuKyDate = Carbon::createFromFormat('m/Y', $hoso->tu_ky);
             $tuKyString = $tuKyDate->format('m/Y');
 
-            $gia1m22223 = floatval($hoso->gia_22) * floatval($hoso->he_so);
+            $gia1m22223 = floatval($hoso->gia_22) * floatval($hoso->he_so_22);
 
             $dtHM = 0.0;
             $dt3HM = 0.0;
@@ -89,8 +97,8 @@ class ExcelController extends Controller
             }
 
             $thuenam2226 = $gia1m22223 * ($dtHM * (0.03 / 100) + $dt3HM * (0.07 / 100) + $dtQuaHM * (0.15 / 100));
-            $thuenam1721 = floatval($hoso->gia_17) * floatval($hoso->he_so) * ($dtHM * (0.03 / 100) + $dt3HM * (0.07 / 100) + $dtQuaHM * (0.15 / 100));
-            $thuenam1217 = floatval($hoso->gia_12) * floatval($hoso->he_so) * ($dtHM * (0.03 / 100) + $dt3HM * (0.07 / 100) + $dtQuaHM * (0.15 / 100));
+            $thuenam1721 = floatval($hoso->gia_17) * floatval($hoso->he_so_17) * ($dtHM * (0.03 / 100) + $dt3HM * (0.07 / 100) + $dtQuaHM * (0.15 / 100));
+            $thuenam1217 = floatval($hoso->gia_12) * floatval($hoso->he_so_12) * ($dtHM * (0.03 / 100) + $dt3HM * (0.07 / 100) + $dtQuaHM * (0.15 / 100));
 
             $start_date = $tuKyDate->startOfMonth();
             $end_date = Carbon::createFromFormat('d/m/Y', $hoso->den_ky)->endOfMonth();
@@ -169,8 +177,10 @@ class ExcelController extends Controller
             $sheet1->setCellValue('L' . $row, $hoso->dia_chi);
             $sheet1->setCellValue('M' . $row, $hoso->han_muc);
             $sheet1->setCellValue('N' . $row, $hoso->vi_tri);
-            $sheet1->setCellValue('O' . $row, $hoso->he_so);
-            $sheet1->setCellValue('R' . $row, $tuKyString);
+            $sheet1->setCellValue('O' . $row, $hoso->he_so_22);
+            $sheet1->setCellValue('P' . $row, $hoso->he_so_12);
+            $sheet1->setCellValue('Q' . $row, $hoso->he_so_17);
+            $sheet1->setCellValue('R' . $row, "01/$tuKyString");
             $sheet1->setCellValue('S' . $row, $hoso->den_ky);
             $sheet1->setCellValue('T' . $row, $hoso->gia_22);
             $sheet1->setCellValue('U' . $row, $gia1m22223);
@@ -212,14 +222,16 @@ class ExcelController extends Controller
                         $sheet2->setCellValue('F' . $rowDP, round($thue));
                     }
                     $sheet2->setCellValue('C' . $rowDP, $hoso->mst);
-                    $sheet2->setCellValue('G' . $rowDP, '01/11/' . $i);
-                    $sheet2->setCellValue('I' . $rowDP, 'Phát sinh NVT từ ' . $tuKyString . ' (TĐS ' . $hoso->tds . '-' . $hoso->tbd . ')');
+                    $sheet2->setCellValue('I' . $rowDP, $hoso->ma_pnn);
+                    $sheet2->setCellValue('H' . $rowDP, '01.11.' . $i);
+                    $sheet2->setCellValue('J' . $rowDP, 'Phát sinh NVT từ ' . $tuKyString . ' (TĐS ' . $hoso->tds . '-' . $hoso->tbd . ')');
                     $rowDP++;
                 }
             } else {
                 $sheet2->setCellValue('C' . $rowDP, $hoso->mst);
-                $sheet2->setCellValue('G' . $rowDP, '01/11/' . $tuKyDate->year);
-                $sheet2->setCellValue('I' . $rowDP, 'Phát sinh NVT từ ' . $tuKyString . ' (TĐS ' . $hoso->tds . '-' . $hoso->tbd . ')');
+                $sheet2->setCellValue('I' . $rowDP, $hoso->ma_pnn);
+                $sheet2->setCellValue('H' . $rowDP, '01.11.' . $tuKyDate->year);
+                $sheet2->setCellValue('J' . $rowDP, 'Phát sinh NVT từ ' . $tuKyString . ' (TĐS ' . $hoso->tds . '-' . $hoso->tbd . ')');
                 $thue = $thueGD2226 - $thuenam2226 * (2024 - $tuKyDate->year + 1);
                 $sheet2->setCellValue('F' . $rowDP, round($thue));
                 $rowDP++;
@@ -237,4 +249,97 @@ class ExcelController extends Controller
         // Ghi dữ liệu vào tệp Excel
         $writer->save('php://output');
     }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xls,xlsx',
+        ]);
+
+        $path = $request->file('file')->getRealPath();
+
+        $spreadsheet = IOFactory::load($path);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow();
+
+        for ($row = 2; $row <= $highestRow; ++$row) {
+            if ($worksheet->getCell('A' . $row)->getValue() == '') {
+                continue;
+            }
+            $tu_ky_excel_value = $worksheet->getCell('P' . $row)->getValue();
+            $tu_ky_timestamp = SharedDate::excelToTimestamp($tu_ky_excel_value);
+            $tu_ky = date('m/Y', $tu_ky_timestamp);
+
+            $duongStr = $worksheet->getCell('I' . $row)->getValue();
+            $doanStr = $worksheet->getCell('J' . $row)->getValue();
+            $viTriStr = $worksheet->getCell('L' . $row)->getValue();
+
+            $duong = DuongPho::where('duong_pho', $duongStr)->first();
+            $doan = Doan::where('doan_duong', $doanStr)->first();
+            $viTri = ViTri::where('vi_tri', $viTriStr)->first();
+
+            if (!$duong || !$doan || !$viTri) {
+                continue;
+            }
+
+            $results = GiaDat::where('duong_id', $duong->id)
+                ->where('doan_id', $doan->id)
+                ->where('vi_tri_id', $viTri->id)
+                ->get();
+
+            $resultsArray = $results->toArray();
+
+            $ngay_cap_excel_value = $worksheet->getCell('E' . $row)->getValue();
+            $ngay_cap_timestamp = SharedDate::excelToTimestamp($ngay_cap_excel_value);
+            $ngay_cap = date('d/m/Y', $ngay_cap_timestamp);
+
+            // Convert $ngay_cap to dd/mm/YYYY format
+            list($day, $month, $year) = explode('/', $ngay_cap);
+            $ngay_cap_formatted = sprintf('%02d/%02d/%04d', $day, $month, $year);
+
+            $gia17 = null;
+
+            if (isset($resultsArray[0]) && isset($resultsArray[1]) && isset($resultsArray[2])) {
+                $gia17 = ($year > 2019 || ($year == 2019 && ($month > 2 || ($month == 2 && $day > 10)))) ? $resultsArray[0]['gia_dat'] : $resultsArray[1]['gia_dat'];
+                $gia22 = $resultsArray[0]['gia_dat'];
+                $gia12 = $resultsArray[2]['gia_dat'];
+            } else {
+                $gia17 = 0;
+                $gia22 = 0;
+                $gia12 = 0;
+            }
+
+            $dia_chi = 'TĐS ' . $worksheet->getCell('F' . $row)->getValue() . '-' . $worksheet->getCell('G' . $row)->getValue() . ', ' . $worksheet->getCell('I' . $row)->getValue();
+
+            $rowData = [
+                'mst' => $worksheet->getCell('A' . $row)->getValue(),
+                'ten' => $worksheet->getCell('B' . $row)->getValue(),
+                'to' => $worksheet->getCell('C' . $row)->getValue(),
+                'ma_pnn' => $worksheet->getCell('Q' . $row)->getValue(),
+                'so_gcn' => $worksheet->getCell('D' . $row)->getValue(),
+                'ngay_cap' => $ngay_cap_formatted,
+                'tds' => $worksheet->getCell('F' . $row)->getValue(),
+                'tbd' => $worksheet->getCell('G' . $row)->getValue(),
+                'dt' => $worksheet->getCell('H' . $row)->getValue(),
+                'duong_pho' => $duongStr,
+                'doan_duong' => $doanStr,
+                'dia_chi' => $dia_chi,
+                'han_muc' => $worksheet->getCell('K' . $row)->getValue(),
+                'vi_tri' => $viTriStr,
+                'he_so_22' => $worksheet->getCell('M' . $row)->getValue(),
+                'he_so_12' => $worksheet->getCell('N' . $row)->getValue(),
+                'he_so_17' => $worksheet->getCell('O' . $row)->getValue(),
+                'tu_ky' => $tu_ky,
+                'den_ky' => '31/12/2024',
+                'gia_22' => $gia22,
+                'gia_17' => $gia17,
+                'gia_12' => $gia12,
+            ];
+
+            HoSo::create($rowData);
+        }
+
+        return redirect()->route('kekhai.index')->with('success', 'File uploaded successfully and data imported into database.');
+    }
+
 }

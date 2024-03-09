@@ -11,7 +11,7 @@ class KeKhaiController extends Controller
 {
     public function index()
     {
-        $hosos = HoSo::latest()->paginate(50);
+        $hosos = HoSo::latest()->paginate(500);
         return view("index", compact('hosos'))->with('i', (request()->input('page', 1) - 1) * 50);
     }
 
@@ -38,7 +38,9 @@ class KeKhaiController extends Controller
             'dia_chi' => 'required',
             'han_muc' => 'required',
             'vi_tri' => 'required',
-            'he_so' => 'required',
+            'he_so_22' => 'required',
+            'he_so_12' => 'required',
+            'he_so_17' => 'required',
             'tu_ky' => 'required',
             'den_ky' => 'required',
             'gia_22' => 'required',
@@ -46,8 +48,25 @@ class KeKhaiController extends Controller
             'gia_12' => 'required'
         ]);
 
-        HoSo::create($request->all());
-        return redirect()->route('kekhai.create')->with('success', 'Created Successfully.');
+        if ($request->has('id')) {
+            // Nếu request có chứa id, đây là cố gắng chỉnh sửa một HoSo hiện có
+            $hoso = HoSo::find($request->id);
+
+            if ($hoso) {
+                // Cập nhật các thuộc tính của HoSo
+                $hoso->update($request->all());
+
+                return redirect()->route('kekhai.index')->with('success', 'Hoso updated successfully.');
+            } else {
+                return redirect()->route('kekhai.index')->with('success', 'Hoso not found.');
+            }
+        } else {
+            // Nếu không có id, tạo một bản ghi HoSo mới
+            $hosoData = $request->except('id');
+            HoSo::create($hosoData);
+        }
+
+        return redirect()->route('kekhai.create')->with('success', 'Saved Successfully.');
     }
 
     public function show(HoSo $hoso)
@@ -55,9 +74,12 @@ class KeKhaiController extends Controller
         return redirect()->route('kekhai.index')->with('success', 'Created Successfully.');
     }
 
-    public function edit(HoSo $hoso)
+    public function edit(int $id)
     {
-        return redirect()->route('kekhai.index')->with('success', 'Created Successfully.');
+        $hoso = HoSo::findOrFail($id); // Retrieve the HoSo record based on the provided $id
+        $doans = Doan::pluck('doan_duong')->toArray();
+        $duong_phos = DuongPho::pluck('duong_pho')->toArray();
+        return view('create', compact('hoso', 'duong_phos', 'doans'));
     }
 
     public function destroy(int $id)
