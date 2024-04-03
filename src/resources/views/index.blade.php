@@ -75,7 +75,7 @@
             <td style="white-space: nowrap;">{{ $hoso->ten }}</td>
             <td>{{ $hoso->to }}</td>
             <td style="white-space: nowrap;">{{ $hoso->so_gcn }}</td>
-            <td style="white-space: nowrap;">{{ date('d/m/Y', strtotime($hoso->ngay_cap)) }}</td>
+            <td style="white-space: nowrap;">{{ $hoso->ngay_cap }}</td>
             <td>{{ $hoso->tds }}</td>
             <td>{{ $hoso->tbd }}</td>
             <td>{{ $hoso->dt }}</td>
