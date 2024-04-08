@@ -365,8 +365,8 @@ $(document).ready(function() {
         clearTimeout(typingTimer);
 
         typingTimer = setTimeout(function() {
-            $('#he_so_12').val(('#he_so_22').val());
-            $('#he_so_17').val(('#he_so_22').val());
+            $('#he_so_12').val($('#he_so_22').val());
+            $('#he_so_17').val($('#he_so_22').val());
         }, doneTypingInterval);
     });
 

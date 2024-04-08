@@ -69,9 +69,10 @@
         // Lấy năm từ tu_ky để so sánh
         $year = \Carbon\Carbon::createFromFormat('m/Y', $hoso->tu_ky)->year;
         @endphp
-        <tr @if($year < 2017 && $hoso->gia_12 == 0) style="background-color: #ffcccc;" @endif>
+        <tr @if($year < 2017 && $hoso->gia_12 == 0) style="background-color: #ffcccc;"
+            @endif>
             <td>{{ ++$i }}</td>
-            <td>{{ $hoso->mst }}</td>
+            <td><span @if(strlen($hoso->mst) != 10) style="color: red;" @endif>{{ $hoso->mst }}</span></td>
             <td style="white-space: nowrap;">{{ $hoso->ten }}</td>
             <td>{{ $hoso->to }}</td>
             <td style="white-space: nowrap;">{{ $hoso->so_gcn }}</td>

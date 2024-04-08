@@ -31,48 +31,6 @@ class ExcelController extends Controller
         $sheet2 = $spreadsheet->createSheet();
         $sheet2->setTitle('DS DP Tờ Khai');
 
-        // // Đặt giá trị cho tiêu đề các cột
-        // $sheet->setCellValue('A1', 'MST');
-        // $sheet->setCellValue('B1', 'Tên');
-        // $sheet->setCellValue('C1', 'Tổ');
-        // $sheet->setCellValue('D1', 'Số GCN');
-        // $sheet->setCellValue('E1', 'Ngày cấp');
-        // $sheet->setCellValue('F1', 'Thửa');
-        // $sheet->setCellValue('G1', 'TBD');
-        // $sheet->setCellValue('H1', 'DT');
-        // $sheet->setCellValue('I1', 'Đường/phố');
-        // $sheet->setCellValue('J1', 'Đoạn đường');
-        // $sheet->setCellValue('K1', 'Địa chỉ thửa đất');
-        // $sheet->setCellValue('L1', 'Hạn mức');
-        // $sheet->setCellValue('M1', 'Vị trí');
-        // $sheet->setCellValue('N1', 'Hệ số 22-26');
-        // $sheet->setCellValue('O1', 'Hệ số 12-16');
-        // $sheet->setCellValue('P1', 'Hệ số 17-21');
-        // $sheet->setCellValue('Q1', 'Từ kỳ');
-        // $sheet->setCellValue('R1', 'Đến kỳ');
-        // $sheet->setCellValue('S1', 'Giá đất 22-26CN');
-        // $sheet->setCellValue('T1', 'Giá 1 m2 đất 22-23CN');
-        // $sheet->setCellValue('U1', 'Thuế/năm GĐ 22-26CN');
-        // $sheet->setCellValue('V1', 'Thuế GĐ 22-26CN ');
-        // $sheet->setCellValue('W1', 'Giá đất GĐ 17-21CN');
-        // $sheet->setCellValue('X1', 'Thuế/năm GĐ 17-21CN ');
-        // $sheet->setCellValue('Y1', 'Thuế GĐ 17-21CN ');
-        // $sheet->setCellValue('Z1', 'Giá đất GĐ 12-16CN');
-        // $sheet->setCellValue('AA1', 'Thuế/năm GĐ 12-16CN ');
-        // $sheet->setCellValue('AB1', 'Thuế GĐ 12-16CN ');
-
-        // Tô màu cho hàng 1
-        // $styleArray = [
-        //     'fill' => [
-        //         'fillType' => Fill::FILL_SOLID,
-        //         'startColor' => [
-        //             'rgb' => 'FFFF00', // Màu vàng
-        //         ],
-        //     ],
-        // ];
-        // $sheet->getStyle('1')->applyFromArray($styleArray);
-
-        // Dòng bắt đầu ghi dữ liệu, ở đây bắt đầu từ dòng 2 vì dòng 1 đã dành cho tiêu đề
         $row = 1;
         $rowDP = 1;
 
@@ -139,7 +97,7 @@ class ExcelController extends Controller
                     $so_thang_giai_doan_2 = $giai_doan_2_start->diffInMonths($end_date, false) + 1;
                     $so_thang_giai_doan_3 = 0;
                 } else {
-                    $so_thang_giai_doan_1 = $start_date->diffInMonths($giai_doan_1_end, false);
+                    $so_thang_giai_doan_1 = $start_date->diffInMonths($giai_doan_1_end, false) + 1;
                     $so_thang_giai_doan_2 = $giai_doan_2_start->diffInMonths($giai_doan_2_end, false) + 1;
                     $so_thang_giai_doan_3 = $giai_doan_3_start->diffInMonths($end_date, false) + 1;
                 }
@@ -162,6 +120,67 @@ class ExcelController extends Controller
             $thueGD2226 = $thuenam2226 * $so_thang_giai_doan_3 / 12;
             $thueGD1721 = $thuenam1721 * $so_thang_giai_doan_2 / 12;
             $thueGD1217 = $thuenam1217 * $so_thang_giai_doan_1 / 12;
+
+            // Tính phạt chậm nộp
+            $tax_periods = [
+                ["start" => "2012-01-01", "end" => "2012-12-31"],
+                ["start" => "2013-01-01", "end" => "2013-12-31"],
+                ["start" => "2014-01-01", "end" => "2014-05-31"],
+                ["start" => "2014-06-01", "end" => "2014-10-31"],
+                ["start" => "2014-11-01", "end" => "2015-05-31"],
+                ["start" => "2015-06-01", "end" => "2015-10-31"],
+                ["start" => "2015-11-01", "end" => "2016-05-31"],
+                ["start" => "2016-06-01", "end" => "2016-10-31"],
+                ["start" => "2016-11-01", "end" => "2017-05-31"],
+                ["start" => "2017-06-01", "end" => "2017-10-31"],
+                ["start" => "2017-11-01", "end" => "2018-05-31"],
+                ["start" => "2018-06-01", "end" => "2018-10-31"],
+                ["start" => "2018-11-01", "end" => "2019-05-31"],
+                ["start" => "2019-06-01", "end" => "2019-10-31"],
+                ["start" => "2019-11-01", "end" => "2020-10-31"],
+                ["start" => "2020-11-01", "end" => "2021-10-31"],
+                ["start" => "2021-11-01", "end" => "2022-10-31"],
+                ["start" => "2022-11-01", "end" => "2023-10-31"],
+                ["start" => "2023-11-01", "end" => "2024-10-31"]
+            ];
+            // Ngày nộp thuế là ngày hiện tại cộng thêm 5 ngày
+            $paymentDate = strtotime('+5 days');
+
+            $chamnop = 0;
+            foreach ($tax_periods as $period) {
+                $start_date = strtotime($period["start"]);
+                $end_date = strtotime($period["end"]);
+
+                if ($paymentDate > $end_date) {
+                    $daysLate = ceil(($paymentDate - $end_date) / (60 * 60 * 24));
+                    $thue = 0;// TODOs: Update
+                    // Tính thuế cho các giai đoạn 2022-2026, 2017-2021 và 2012-2017
+                    if ($start_date >= strtotime("2022-01-01")) {
+                        // Logic tính thuế cho giai đoạn 2022-2026
+                        $thue = $thueGD2226; // Giả sử $thueGD2226 là số tiền thuế cho giai đoạn này
+                    } elseif ($start_date >= strtotime("2017-01-01")) {
+                        // Logic tính thuế cho giai đoạn 2017-2021
+                        $thue = $thueGD1721; // Giả sử $thueGD1721 là số tiền thuế cho giai đoạn này
+                    } elseif ($start_date >= strtotime("2012-01-01")) {
+                        // Logic tính thuế cho giai đoạn 2012-2017
+                        $thue = $thueGD1217; // Giả sử $thueGD1217 là số tiền thuế cho giai đoạn này
+                    } else {
+                        // Không có thuế nếu nằm ngoài các giai đoạn đã nêu
+                        $thue = 0;
+                    }
+
+                    if ($start_date < strtotime("2015-01-01")) {
+                        if ($daysLate < 90) {
+                            $chamnop += $thue * (0.05 / 100) * $daysLate;
+                        } else {
+                            $chamnop += $thue * (0.07 / 100) * $daysLate;
+                        }
+                    } else {
+                        $chamnop += $thue * (0.05 / 100) * $daysLate;
+                    }
+                }
+            }
+
 
             // Ghi dữ liệu từ đối tượng vào các cột tương ứng
             $sheet1->setCellValue('B' . $row, $hoso->mst);
@@ -190,12 +209,13 @@ class ExcelController extends Controller
             $sheet1->setCellValue('Y' . $row, round($thuenam1721));
             $sheet1->setCellValue('Z' . $row, round($thueGD1721));
             $sheet1->setCellValue('AA' . $row, $hoso->gia_12);
-            // $sheet->setCellValue('AB' . $row, $thuenam1217);
-            // $sheet->setCellValue('AC' . $row, $thueGD1217);
+            $sheet1->setCellValue('AB' . $row, round($thuenam1217));
+            $sheet1->setCellValue('AC' . $row, round($thueGD1217));
             // Thêm các cột khác nếu cần thiết
             $sheet1->setCellValue('AK' . $row, $dtHM);
             $sheet1->setCellValue('AL' . $row, $dt3HM);
             $sheet1->setCellValue('AM' . $row, $dtQuaHM);
+            $sheet1->setCellValue('AS' . $row, $chamnop);
 
             // Tăng chỉ số dòng
             $row++;
@@ -312,7 +332,7 @@ class ExcelController extends Controller
             $dia_chi = 'TĐS ' . $worksheet->getCell('F' . $row)->getValue() . '-' . $worksheet->getCell('G' . $row)->getValue() . ', ' . $worksheet->getCell('I' . $row)->getValue();
 
             $rowData = [
-                'mst' => $worksheet->getCell('A' . $row)->getValue(),
+                'mst' => trim($worksheet->getCell('A' . $row)->getValue()),
                 'ten' => $worksheet->getCell('B' . $row)->getValue(),
                 'to' => $worksheet->getCell('C' . $row)->getValue(),
                 'ma_pnn' => $worksheet->getCell('Q' . $row)->getValue(),
