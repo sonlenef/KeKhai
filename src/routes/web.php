@@ -26,3 +26,4 @@ Route::delete('/reset', [KeKhaiController::class, 'reset'])->name('reset');
 Route::get('/mst-request', [ProxyController::class, 'proxyRequest'])->name('proxy.request');
 Route::get('/export', [ExcelController::class, 'export'])->name('export');
 Route::post('/upload', [ExcelController::class, 'upload'])->name('upload');
+Route::post('/uploadExcel', [ExcelController::class, 'uploadExcel'])->name('uploadExcel');

@@ -34,6 +34,7 @@ return new class extends Migration {
             $table->string('gia_22');
             $table->string('gia_17');
             $table->string('gia_12');
+            $table->string('ghichu')->nullable();
             $table->timestamps();
         });
     }

@@ -30,6 +30,7 @@ class HoSo extends Model
         'den_ky',
         'gia_22',
         'gia_17',
-        'gia_12'
+        'gia_12',
+        'ghichu'
     ];
 }

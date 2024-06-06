@@ -162,6 +162,12 @@
             <div class="invalid-feedback">Please fill out this field.</div>
         </div>
     </dic>
+    <div class="form-group">
+        <label for="ghichu">Ghi chú</label>
+        <textarea class="form-control" id="ghichu" placeholder="Nhập ghi chú" name="ghichu"></textarea>
+        <div class="valid-feedback">Valid.</div>
+        <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
     <button id="form-submit-button" type="submit" class="btn btn-primary">Submit</button>
 </form>
 
@@ -202,6 +208,7 @@ $(document).ready(function() {
     $("#gia_22").val('{{ $hoso->gia_22 }}');
     $("#gia_17").val('{{ $hoso->gia_17 }}');
     $("#gia_12").val('{{ $hoso->gia_12 }}');
+    $("#ghichu").val('{{ $hoso->ghichu }}');
 });
 </script>
 @endif

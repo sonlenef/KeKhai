@@ -9,9 +9,19 @@
     <div class="col-sm-12 row justify-content-center align-items-center">
         <form class="col-sm-12 text-center" action="{{ route('upload') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <h6>Cập nhật danh sách tờ khai: </h6>
             <a href="{{ asset('example.xlsx') }}" class="btn btn-link" download>Tải file mẫu</a>
             <input type="file" name="file" />
             <button class="btn btn-primary" type="submit">Upload</button>
+        </form>
+    </div>
+    <div class="col-sm-12 row justify-content-center align-items-center">
+        <form class="col-sm-12 text-center" action="{{ route('uploadExcel') }}" method="POST"
+            enctype="multipart/form-data">
+            @csrf
+            <h6>Cập nhật mã PNN từ sổ bộ: </h6>
+            <input type="file" name="file" />
+            <button class="btn btn-primary" type="submit">Upload Sổ Bộ</button>
         </form>
     </div>
     <br>
@@ -41,6 +51,7 @@
             <tr>
                 <th style="white-space: nowrap;">STT</th>
                 <th style="white-space: nowrap;">NST</th>
+                <th style="white-space: nowrap;">Mã PNN</th>
                 <th style="white-space: nowrap;">Tên</th>
                 <th style="white-space: nowrap;">Tổ</th>
                 <th style="white-space: nowrap;">Số GCN</th>
@@ -73,6 +84,8 @@
             @endif>
             <td>{{ ++$i }}</td>
             <td><span @if(strlen($hoso->mst) != 10) style="color: red;" @endif>{{ $hoso->mst }}</span></td>
+            <td><span @if(strlen($hoso->ma_pnn) == '') style="background-color: red;" @endif>{{ $hoso->ma_pnn }}</span>
+            </td>
             <td style="white-space: nowrap;">{{ $hoso->ten }}</td>
             <td>{{ $hoso->to }}</td>
             <td style="white-space: nowrap;">{{ $hoso->so_gcn }}</td>
