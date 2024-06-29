@@ -700,6 +700,11 @@ class ExcelController extends Controller
             $so_gcn = $worksheet->getCell('E' . $row)->getValue();
             $mst = $worksheet->getCell('A' . $row)->getValue();
 
+            $hososCount = $hosos->where('mst', $mst)->where('so_gcn', $so_gcn)->count();
+            if ($hososCount > 1) {
+                continue;
+            }
+
             $hoso = $hosos->where('mst', $mst)->where('so_gcn', $so_gcn)->first();
             if ($hoso) {
                 $hoso->ma_pnn = $mapnn;
