@@ -694,21 +694,32 @@ class ExcelController extends Controller
         $highestRow = $worksheet->getHighestRow();
 
         $hosos = HoSo::all();
+        // Duyệt toàn bộ hồ sơ
+        for ($hosoIndex = 0; $hosoIndex < count($hosos); $hosoIndex++) {
+            $hoso = $hosos[$hosoIndex];
+            $mapnn = $hoso->ma_pnn;
+            $so_gcn = $hoso->so_gcn;
+            $mst = $hoso->mst;
 
-        for ($row = 2; $row <= $highestRow; ++$row) {
-            $mapnn = $worksheet->getCell('C' . $row)->getValue();
-            $so_gcn = $worksheet->getCell('E' . $row)->getValue();
-            $mst = $worksheet->getCell('A' . $row)->getValue();
+            // Duyệt toàn bộ dòng trong file excel
+            for ($row = 2; $row <= $highestRow; ++$row) {
+                $mapnnExcel = $worksheet->getCell('C' . $row)->getValue();
+                $so_gcnExcel = $worksheet->getCell('E' . $row)->getValue();
+                $mstExcel = $worksheet->getCell('A' . $row)->getValue();
 
-            $hososCount = $hosos->where('mst', $mst)->where('so_gcn', $so_gcn)->count();
-            if ($hososCount > 1) {
-                continue;
-            }
+                if ($so_gcn == $so_gcnExcel && $mst == $mstExcel) {
+                    if ($mapnn && $mapnn != '') {
+                        $hoso->ma_pnn = '';
+                        $hoso->save();
+                        break;
+                    }
+                    $mapnn = $worksheet->getCell('C' . $row)->getValue();
+                    $so_gcn = $worksheet->getCell('E' . $row)->getValue();
+                    $mst = $worksheet->getCell('A' . $row)->getValue();
 
-            $hoso = $hosos->where('mst', $mst)->where('so_gcn', $so_gcn)->first();
-            if ($hoso) {
-                $hoso->ma_pnn = $mapnn;
-                $hoso->save();
+                    $hoso->ma_pnn = $mapnn;
+                    $hoso->save();
+                }
             }
         }
 
