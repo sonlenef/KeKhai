@@ -128,7 +128,7 @@ class ExcelController extends Controller
             $thueGD1217 = $thuenam1217 * $so_thang_giai_doan_1 / 12;
 
             $chamnop = 0.0;
-            $ngaynop = Carbon::createFromFormat('d/m/Y', '07/06/2024');
+            $ngaynop = Carbon::createFromFormat('d/m/Y', '05/08/2024');
 
             if ($tuKyDate->year <= 2012) {
                 $lateFee = $this->calculateLateFee('2013-01-01', $ngaynop->format('Y-m-d'));
@@ -700,14 +700,18 @@ class ExcelController extends Controller
             $mapnn = $hoso->ma_pnn;
             $so_gcn = $hoso->so_gcn;
             $mst = $hoso->mst;
+            $tds = $hoso->tds;
+            $tbd = $hoso->tbd;
 
             // Duyệt toàn bộ dòng trong file excel
             for ($row = 2; $row <= $highestRow; ++$row) {
                 $mapnnExcel = $worksheet->getCell('C' . $row)->getValue();
+                $tdsExcel = $worksheet->getCell('G' . $row)->getValue();
+                $tbdExcel = $worksheet->getCell('H' . $row)->getValue();
                 $so_gcnExcel = $worksheet->getCell('E' . $row)->getValue();
                 $mstExcel = $worksheet->getCell('A' . $row)->getValue();
 
-                if ($so_gcn == $so_gcnExcel && $mst == $mstExcel) {
+                if ($so_gcn == $so_gcnExcel && $mst == $mstExcel && $tds == $tdsExcel && $tbd == $tbdExcel) {
                     if ($mapnn && $mapnn != '') {
                         $hoso->ma_pnn = '';
                         $hoso->save();
